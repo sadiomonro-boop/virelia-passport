@@ -66,10 +66,12 @@ def draw_arms(draw, cx, top):
         a = math.pi * i / 5 - math.pi / 2
         star.append((sx + r * math.cos(a), sy + r * math.sin(a)))
     draw.polygon(star, fill=GOLD)
-    # light rays
+    # light beams: narrow triangles fanning outward from the lamp room
     for dx in (-16, -8, 0, 8, 16):
-        draw.polygon([(cx + dx, y0 + 14), (cx + dx - 5, y0 + 30),
-                      (cx + dx + 5, y0 + 30)], fill=(240, 205, 90))
+        ax = cx + int(dx * 0.7)
+        bx = cx + int(dx * 1.3)
+        draw.polygon([(ax, y0 + 14), (bx - 3, y0 + 30),
+                      (bx + 3, y0 + 30)], fill=(240, 205, 90))
     # lighthouse tower
     draw.polygon([(cx - 8, y0 + 30), (cx + 8, y0 + 30), (cx + 6, y0 + 56),
                   (cx - 6, y0 + 56)], fill=(245, 240, 225))
@@ -91,9 +93,13 @@ def draw_portrait(base, x, y, w, h):
         t = i / h
         c = tuple(int(a + (b - a) * t) for a, b in zip((122, 138, 148), (168, 180, 184)))
         d.line([(0, i), (w, i)], fill=c)
-    # distant lighthouse silhouette
-    d.polygon([(w - 34, 18), (w - 26, 18), (w - 28, 62), (w - 32, 62)],
-              fill=(90, 104, 116))
+    # distant lighthouse silhouette: wider tower in lighter grey, with a
+    # soft glow halo around the lamp so it reads as a lighthouse, not a dot
+    d.ellipse([w - 44, 2, w - 16, 28], fill=(247, 224, 138))
+    d.polygon([(w - 40, 18), (w - 30, 18), (w - 32, 66), (w - 38, 66)],
+              fill=(150, 165, 175))
+    d.rectangle([w - 41, 16, w - 29, 20], fill=(150, 165, 175))
+    d.line([(w - 42, 66), (w - 28, 66)], fill=(150, 165, 175), width=2)
     d.ellipse([w - 38, 8, w - 22, 22], fill=(240, 205, 90))
     # shoulders / coat
     d.polygon([(8, h), (52, 128), (98, 128), (142, h)], fill=(32, 46, 72))
@@ -103,6 +109,8 @@ def draw_portrait(base, x, y, w, h):
     d.polygon([(98, 128), (75, 168), (84, 128)], fill=(24, 36, 58))
     # neck
     d.rectangle([66, 112, 84, 134], fill=(216, 178, 138))
+    # neck shadow under the chin
+    d.rectangle([66, 112, 84, 121], fill=(198, 158, 118))
     # face
     d.ellipse([52, 34, 98, 106], fill=(232, 195, 154))
     # hair: dark frame around face
@@ -111,15 +119,32 @@ def draw_portrait(base, x, y, w, h):
     d.polygon([(102, 60), (92, 58), (96, 118), (104, 108)], fill=(58, 40, 30))
     d.ellipse([50, 30, 100, 62], fill=(58, 40, 30))
     d.ellipse([54, 40, 96, 104], fill=(232, 195, 154))
+    # soft cheek shadows and a jaw shadow so the face is not one flat fill
+    d.ellipse([58, 82, 67, 87], fill=(226, 186, 146))
+    d.ellipse([83, 82, 92, 87], fill=(226, 186, 146))
+    d.arc([56, 62, 94, 108], 15, 165, fill=(208, 170, 130), width=3)
+    # hair strands: thin lighter lines so the hair reads as strands, not a block
+    for sx, sy0, sy1 in ((50, 62, 108), (55, 60, 104), (100, 62, 108), (95, 60, 104)):
+        d.line([(sx, sy0), (sx - 1 if sx < 75 else sx + 1, sy1)],
+               fill=(84, 60, 44), width=1)
+    d.arc([54, 30, 96, 56], 200, 340, fill=(84, 60, 44), width=1)
     # keeper cap
     d.pieslice([48, 22, 102, 58], 180, 360, fill=(28, 42, 66))
     d.rectangle([48, 44, 102, 52], fill=(28, 42, 66))
     d.ellipse([70, 44, 80, 54], fill=(240, 205, 90))
+    # cap brim highlight: lighter dome edge and brim top edge
+    d.arc([48, 22, 102, 58], 180, 360, fill=(74, 96, 136), width=2)
+    d.line([(50, 45), (100, 45)], fill=(96, 122, 162), width=2)
     # brows, eyes, nose, mouth
     d.line([(60, 66), (70, 64)], fill=(58, 40, 30), width=2)
     d.line([(80, 64), (90, 66)], fill=(58, 40, 30), width=2)
-    d.ellipse([61, 69, 67, 74], fill=(30, 30, 34))
-    d.ellipse([83, 69, 89, 74], fill=(30, 30, 34))
+    # eyes with whites, iris and pupil (was flat dark dots)
+    d.ellipse([60, 68, 69, 76], fill=(246, 243, 236))
+    d.ellipse([81, 68, 90, 76], fill=(246, 243, 236))
+    d.ellipse([62, 69, 67, 74], fill=(58, 72, 100))
+    d.ellipse([83, 69, 88, 74], fill=(58, 72, 100))
+    d.ellipse([63, 70, 66, 73], fill=(18, 18, 22))
+    d.ellipse([84, 70, 87, 73], fill=(18, 18, 22))
     d.line([(75, 76), (74, 88), (77, 89)], fill=(196, 150, 112), width=2)
     d.line([(67, 96), (83, 96)], fill=(150, 80, 70), width=2)
     base.paste(img, (x, y))
